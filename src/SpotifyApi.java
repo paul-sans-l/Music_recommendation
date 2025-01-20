@@ -14,6 +14,10 @@ import org.apache.http.util.EntityUtils;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+
+import Objects.ImageObject;
+import Objects.Track;
+
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.util.HashSet;
@@ -168,7 +172,7 @@ public class SpotifyApi {
         }
 
         // Write updated tracks to file
-        try (FileWriter writer = new FileWriter("Tracks.json")) {
+        try (FileWriter writer = new FileWriter("src/Tracks.json")) {
             JsonObject updatedData = new JsonObject();
             updatedData.add("tracks", existingTracksArray);
             writer.write(updatedData.toString());

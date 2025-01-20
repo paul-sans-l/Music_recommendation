@@ -1,3 +1,4 @@
+package Objects;
 public class ImageObject {
     int height;
     int width;

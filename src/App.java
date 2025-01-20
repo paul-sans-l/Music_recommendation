@@ -55,7 +55,7 @@ public class App extends Application {
             new Thread(() -> {
                 try {
                     SpotifyApi.getPlaylists(accessToken);
-                    SpotifyApi.getTracks(accessToken,"6RWiSU4cAHKJUPBaMCXSIV");
+                    SpotifyApi.getTracks(accessToken,"5KnAoqeMiqW2tYaJ8WYRin");
                 } catch (IOException e) {
                     System.err.println("Failed to fetch playlists: " + e.getMessage());
                 }

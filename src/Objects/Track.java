@@ -1,5 +1,4 @@
-
-
+package Objects;
 public class Track implements Comparable<Track> {
     ImageObject image;
     String title;
