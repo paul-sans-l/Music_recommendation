@@ -10,12 +10,11 @@ public class Listener {
         String redirectUri = "http://localhost:8888/callback";
 
         String authorizationUrl = "https://accounts.spotify.com/authorize" +
-                "?client_id=" + clientId +
-                "&response_type=code" +
-                "&redirect_uri=" + redirectUri +
-                "&scope=playlist-read-private%20playlist-read-collaborative" +
-                "&state=YourState";
-
+    "?client_id=" + clientId +
+    "&response_type=code" +
+    "&redirect_uri=" + redirectUri +
+    "&scope=playlist-read-private%20playlist-read-collaborative%20user-top-read" +
+    "&state=YourState";
         try {
             // Open the Spotify authorization URL in the user's default browser
             URI uri = new URI(authorizationUrl);

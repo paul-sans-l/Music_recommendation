@@ -1,5 +1,4 @@
 import javafx.application.Application;
-import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -8,11 +7,9 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
-import java.awt.Desktop;
 
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
+
 
 public class App extends Application {
     private static String accessToken;
@@ -49,7 +46,8 @@ public class App extends Application {
         String code = Listener.listen();
         String redirectUri = "http://localhost:8888/callback";
 
-
+        
+        
         try {
             // Get access token using client credentials flow (change to use OAuth for user data)
             accessToken = SpotifyApi.getAccessToken(clientId, clientSecret, code, redirectUri);
@@ -57,6 +55,7 @@ public class App extends Application {
             new Thread(() -> {
                 try {
                     SpotifyApi.getPlaylists(accessToken);
+                    SpotifyApi.getTracks(accessToken,"6RWiSU4cAHKJUPBaMCXSIV");
                 } catch (IOException e) {
                     System.err.println("Failed to fetch playlists: " + e.getMessage());
                 }

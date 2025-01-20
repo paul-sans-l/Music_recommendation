@@ -14,6 +14,10 @@ import org.apache.http.util.EntityUtils;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.util.HashSet;
+import java.util.Set;
 
 public class SpotifyApi {
 
@@ -75,6 +79,99 @@ public class SpotifyApi {
             return playlistNames;
         }
     }
+
+    public static List<Track> getTracks(String accessToken, String playlistId) throws IOException {
+        HttpGet get = new HttpGet("https://api.spotify.com/v1/playlists/" + playlistId + "/tracks");
+        get.setHeader("Authorization", "Bearer " + accessToken);
     
+        try (CloseableHttpClient client = HttpClients.createDefault();
+             CloseableHttpResponse response = client.execute(get)) {
     
+            int statusCode = response.getStatusLine().getStatusCode();
+            if (statusCode != 200) {
+                System.err.println("Failed to fetch tracks. HTTP Status Code: " + statusCode);
+                String responseBody = EntityUtils.toString(response.getEntity());
+                System.err.println("Response Body: " + responseBody);
+                return new ArrayList<>();
+            }
+    
+            String responseBody = EntityUtils.toString(response.getEntity());
+            JsonObject jsonResponse = JsonParser.parseString(responseBody).getAsJsonObject();
+    
+            // Check if the "items" field is present
+            if (!jsonResponse.has("items")) {
+                System.err.println("No tracks found in the response.");
+                return new ArrayList<>();
+            }
+    
+            JsonArray tracks = jsonResponse.getAsJsonArray("items");
+            List<Track> trackList = new ArrayList<>();
+            for (int i = 0; i < tracks.size(); i++) {
+                JsonObject track = tracks.get(i).getAsJsonObject().getAsJsonObject("track");
+                JsonObject album = track.getAsJsonObject("album");
+                JsonArray images = album.getAsJsonArray("images");
+                String imageUrl = images.size() > 0 ? images.get(0).getAsJsonObject().get("url").getAsString() : "";
+                ImageObject image = new ImageObject(50,50,imageUrl);
+                String title = track.get("name").getAsString();
+                String artist = track.getAsJsonArray("artists").get(0).getAsJsonObject().get("name").getAsString();
+                String albumName = album.get("name").getAsString();
+                String albumType = album.get("album_type").getAsString();
+                String releaseDate = album.get("release_date").getAsString();
+                int duration = track.get("duration_ms").getAsInt();
+                String uri = track.get("uri").getAsString();
+                String id = track.get("id").getAsString();
+                int popularity = track.get("popularity").getAsInt();
+                String previewUrl = track.has("preview_url") && !track.get("preview_url").isJsonNull() ? track.get("preview_url").getAsString() : "";
+    
+                Track newTrack = new Track(image, title, artist, albumName, albumType, releaseDate, duration, uri, id, popularity, previewUrl);
+                trackList.add(newTrack);
+                System.out.println("Track: " + title + " by " + artist);
+            }
+            appendTracksToFile(trackList);
+            return trackList;
+        }
+    }
+
+    private static void appendTracksToFile(List<Track> tracks) throws IOException {
+        Set<String> existingTrackIds = new HashSet<>();
+        JsonArray existingTracksArray = new JsonArray();
+
+        // Read existing tracks from file
+        try (FileReader reader = new FileReader("Tracks.json")) {
+            JsonObject existingData = JsonParser.parseReader(reader).getAsJsonObject();
+            existingTracksArray = existingData.getAsJsonArray("tracks");
+            for (int i = 0; i < existingTracksArray.size(); i++) {
+                JsonObject track = existingTracksArray.get(i).getAsJsonObject();
+                existingTrackIds.add(track.get("id").getAsString());
+            }
+        } catch (IOException e) {
+            System.err.println("Tracks.json file not found. A new file will be created.");
+        }
+
+        // Append new tracks if they are not already in the file
+        for (Track track : tracks) {
+            if (!existingTrackIds.contains(track.getId())) {
+                JsonObject trackJson = new JsonObject();
+                trackJson.addProperty("imageUrl", track.getImage().getUrl());
+                trackJson.addProperty("title", track.getTitle());
+                trackJson.addProperty("artist", track.getArtist());
+                trackJson.addProperty("albumName", track.getAlbum());
+                trackJson.addProperty("albumType", track.getAlbumType());
+                trackJson.addProperty("releaseDate", track.getReleaseDate());
+                trackJson.addProperty("duration", track.getDuration());
+                trackJson.addProperty("uri", track.getUri());
+                trackJson.addProperty("id", track.getId());
+                trackJson.addProperty("popularity", track.getPopularity());
+                trackJson.addProperty("previewUrl", track.getPreviewUrl());
+                existingTracksArray.add(trackJson);
+            }
+        }
+
+        // Write updated tracks to file
+        try (FileWriter writer = new FileWriter("Tracks.json")) {
+            JsonObject updatedData = new JsonObject();
+            updatedData.add("tracks", existingTracksArray);
+            writer.write(updatedData.toString());
+        }
+    }
 }
