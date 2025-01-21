@@ -69,7 +69,7 @@ public class App extends Application {
                 submitButton.setVisible(false);
                 accessToken = SpotifyApi.getAccessToken(clientId, clientSecret, authorizationCode, redirectUri);
                 root.setCenter(loadingImage);
-                SpotifyApi.getTracks(accessToken, "6OfVAQ5lGMxCWbzLIziE8P");
+                SpotifyApi.getTracks(accessToken, "6OfVAQ5lGMxCWbzLIziE8P"); // Load then display the tracks using thread
             } catch (IOException e) {
                 e.printStackTrace();
             }
