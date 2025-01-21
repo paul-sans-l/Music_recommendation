@@ -4,10 +4,13 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Scanner;
 
+import Objects.Authorizer;
+
 public class Listener {
-    public static String listen() {
+    public static Authorizer listen() throws IOException {
         String clientId = "20495fa10b8d4f74bfce20d4d8fde4e5"; // Replace with your Spotify client ID
         String redirectUri = "http://localhost:8888/callback";
+        String clientSecret = "60fa5f30ef674a89a353e3cc4eb745a7";
 
         String authorizationUrl = "https://accounts.spotify.com/authorize" +
     "?client_id=" + clientId +
@@ -32,10 +35,12 @@ public class Listener {
 
         // Extract the 'code' parameter from the redirected URL
         String code = extractCodeFromUrl(redirectedUrl);
+
+        String accessToken = SpotifyApi.getAccessToken(clientId, clientSecret, code, redirectUri);
         if (code != null) {
             System.out.println("Authorization code retrieved: " + code);
             scanner.close();
-            return code;
+            return new Authorizer(accessToken, code);
             // Run another program or call another class/method
         } else {
             System.err.println("Failed to extract the authorization code. Please try again.");
@@ -58,6 +63,12 @@ public class Listener {
             System.err.println("Invalid URL: " + e.getMessage());
         }
         return null; // Return null if 'code' is not found
+    }
+
+    public static void main(String[] args) {
+        /*
+         * Break down the code into smaller methods to make it easier to understand.
+         */
     }
 }
 

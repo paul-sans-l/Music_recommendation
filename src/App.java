@@ -10,16 +10,19 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 
+import Objects.Authorizer;
+import javafx.scene.control.Button;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.VBox;
+
 
 public class App extends Application {
     private static String accessToken;
 
     @Override
     public void start(Stage primaryStage) {
-        // Display access token (for testing purposes)
-        System.out.println("Spotify Access Token: " + accessToken);
+        
 
-        // Load image for UI (Spotify logo)
         Image image = new Image(getClass().getResource("Assets/Spotify_Full_logo.png").toExternalForm());
         ImageView imageView = new ImageView(image);
         imageView.setFitWidth(3432 / 20); // Adjust width as needed
@@ -33,39 +36,35 @@ public class App extends Application {
 
         root.setTop(imagePane);
         Scene scene = new Scene(root, 800, 500);
-        primaryStage.setTitle("Customizable Desktop App");
+        // Create text input and submit button
+        TextField textField = new TextField();
+        textField.setPromptText("Enter text here");
+        Button submitButton = new Button("Submit");
+
+        textField.getStyleClass().add("text-field");
+        submitButton.getStyleClass().add("button");
+        
+        submitButton.setOnAction(event -> {
+            String inputText = textField.getText();
+            System.out.println("Submitted text: " + inputText);
+        });
+
+        // Layout for text input and button
+        VBox inputLayout = new VBox(10, textField, submitButton);
+        inputLayout.setAlignment(Pos.CENTER);
+        inputLayout.setPadding(new Insets(10));
+
+        // Add input layout to the center of the root pane
+        root.setCenter(inputLayout);
+        primaryStage.setTitle("Spotify custom recommendations");
         scene.getStylesheets().add(getClass().getResource("Assets/Style.css").toExternalForm());
         primaryStage.setScene(scene);
         primaryStage.show();
+
+        System.out.println("Spotify Access Token: " + accessToken);
     }
 
     public static void main(String[] args) {
-        //System.out.println();
-        String clientId = "20495fa10b8d4f74bfce20d4d8fde4e5"; // Replace with your Spotify client ID
-        String clientSecret = "60fa5f30ef674a89a353e3cc4eb745a7"; // Replace with your Spotify client secret
-        String code = Listener.listen();
-        String redirectUri = "http://localhost:8888/callback";
-
-        
-        
-        try {
-            // Get access token using client credentials flow (change to use OAuth for user data)
-            accessToken = SpotifyApi.getAccessToken(clientId, clientSecret, code, redirectUri);
-            // Fetch and print playlists (run in background thread to not block UI)
-            new Thread(() -> {
-                try {
-                    SpotifyApi.getPlaylists(accessToken);
-                    SpotifyApi.getTracks(accessToken,"5KnAoqeMiqW2tYaJ8WYRin");
-                } catch (IOException e) {
-                    System.err.println("Failed to fetch playlists: " + e.getMessage());
-                }
-            }).start();
-
-        } catch (IOException e) {
-            System.err.println("Failed to retrieve Spotify access token: " + e.getMessage());
-        }
-
-        // Launch JavaFX application
         launch(args);
     }
 }
