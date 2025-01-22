@@ -2,9 +2,7 @@ import java.awt.Desktop;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Scanner;
 
-import Objects.Authorizer;
 
 public class Listener {
     public static void browse() throws IOException {
@@ -43,14 +41,13 @@ public class Listener {
         } catch (URISyntaxException e) {
             System.err.println("Invalid URL: " + e.getMessage());
         }
+        catch (NullPointerException e) {
+            System.err.println("Invalid URL");
+        }
         return null; // Return null if 'code' is not found
     }
 
-    public static void main(String[] args) {
-        /*
-         * Break down the code into smaller methods to make it easier to understand.
-         */
-    }
+    
 }
 
 
