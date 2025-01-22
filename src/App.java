@@ -1,5 +1,9 @@
 
 import java.lang.reflect.Type;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.awt.Desktop;
+
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -41,7 +45,7 @@ public class App extends Application {
     public void start(Stage primaryStage) {
         
         BorderPane root = new BorderPane();
-        Scene scene = new Scene(root, 800, 500);
+        Scene scene = new Scene(root, 1000, 500);
 
         Image icon = new Image(getClass().getResource("Assets/Logo_processed.jpg").toExternalForm());
         primaryStage.getIcons().add(icon);
@@ -126,6 +130,16 @@ public class App extends Application {
                     for (Track track : tracks) {
                         Button trackButton = createTrackButton(track);
                         trackButtonsContainer.getChildren().add(trackButton);
+
+                        trackButton.setOnAction(ev -> {
+                            try {
+                                URI uri = new URI(track.getUri());
+                                Desktop.getDesktop().browse(uri);
+                            } catch (URISyntaxException | IOException e1) {
+                                // TODO Auto-generated catch block
+                                e1.printStackTrace();
+                            }
+                        });
                     }
                     
                     root.setCenter(trackButtonsContainer);
