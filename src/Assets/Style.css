@@ -29,7 +29,7 @@
     -fx-font-size: 16px; /* Font size */
     -fx-font-family: "Helveteca"; /* Clean font */
     -fx-font-weight: bold; /* Bold text */
-    -fx-background-color: #1DB954; /* Spotify green */
+    -fx-background-color: #a71db9; /* Spotify green */
     -fx-text-fill: white; /* White text */
     -fx-border-color: transparent; /* No visible border */
     -fx-border-width: 0; /* No border width */
@@ -41,11 +41,11 @@
 }
 
 .button:hover {
-    -fx-background-color: #1AA34A; /* Slightly darker green on hover */
+    -fx-background-color: #911aa3; /* Slightly darker green on hover */
     -fx-transform: scale(1.05); /* Slight zoom effect */
 }
 
 .button:pressed {
-    -fx-background-color: #14833E; /* Even darker green when pressed */
+    -fx-background-color: #831474; /* Even darker green when pressed */
     -fx-transform: scale(0.95); /* Slight shrink effect on click */
 }

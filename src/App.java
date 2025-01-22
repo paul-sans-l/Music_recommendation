@@ -18,6 +18,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 
 
+
 public class App extends Application {
     private static String accessToken;
     private String clientId = "20495fa10b8d4f74bfce20d4d8fde4e5"; // Replace with your Spotify client ID
@@ -30,9 +31,14 @@ public class App extends Application {
         BorderPane root = new BorderPane();
         Scene scene = new Scene(root, 800, 500);
 
+        Image icon = new Image(getClass().getResource("Assets/Logo_processed.jpg").toExternalForm());
+        primaryStage.getIcons().add(icon);
+
+        
+
         Image image = new Image(getClass().getResource("Assets/Spotify_Full_logo.png").toExternalForm());
-        Image loadImage = new Image(getClass().getResource("Assets/Loading.gif").toExternalForm());
-        Image welcome = new Image(getClass().getResource("Assets/Welcome_message.gif").toExternalForm());
+        Image loadImage = new Image(getClass().getResource("Assets/Loading-.gif").toExternalForm());
+        Image welcome = new Image(getClass().getResource("Assets/Welcome_message-.gif").toExternalForm());
         ImageView imageView = new ImageView(image);
         ImageView loadingImage = new ImageView(loadImage);
         ImageView welcomeImage = new ImageView(welcome);
@@ -53,13 +59,15 @@ public class App extends Application {
         textField.setPromptText("Enter the authorization URL here");
         Button submitButton = new Button("Submit");
 
+        
+
         textField.getStyleClass().add("text-field");
         submitButton.getStyleClass().add("button");
         VBox inputLayout = new VBox(10, textField, submitButton);
         // Display welcome image first
         StackPane welcomePane = new StackPane(welcomeImage);
         root.setCenter(welcomePane);
-        javafx.animation.PauseTransition welcomePause = new javafx.animation.PauseTransition(javafx.util.Duration.seconds(5));
+        javafx.animation.PauseTransition welcomePause = new javafx.animation.PauseTransition(javafx.util.Duration.seconds(5.6));
         welcomePause.setOnFinished(e -> {
             root.setCenter(null);
             StackPane imagePane = new StackPane(imageView);
@@ -69,9 +77,7 @@ public class App extends Application {
         root.setTop(imagePane);
        
         // Create text input and submit button
-        
-       
-
+      
         
         inputLayout.setAlignment(Pos.CENTER);
         inputLayout.setPadding(new Insets(10));
@@ -91,6 +97,7 @@ public class App extends Application {
             String authorizationCode = Listener.extractCodeFromUrl(inputText);
             textField.setVisible(false);
             submitButton.setVisible(false);
+            
             root.setCenter(loadingImage);
             javafx.animation.PauseTransition pause = new javafx.animation.PauseTransition(javafx.util.Duration.seconds(5));
             pause.setOnFinished(e -> {
