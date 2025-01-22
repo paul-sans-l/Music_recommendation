@@ -175,7 +175,7 @@ public class App extends Application {
         // Create the button
         Button button = new Button();
         button.setPrefWidth(380);
-        button.setPrefHeight(60);
+        button.setPrefHeight(120);
         button.getStyleClass().add("track-button");
 
         // Create the HBox layout
@@ -184,20 +184,19 @@ public class App extends Application {
         content.getStyleClass().add("track-content");
 
         // Add an image for the play icon
-        // ImageView playIcon = new ImageView(new Image(track.getImage().getUrl())); // Replace with your image path
-        // playIcon.setFitHeight(24);
-        // playIcon.setFitWidth(24);
+        ImageView playIcon = new ImageView(new Image(track.getImageUrl())); // Replace with your image path
+        playIcon.setFitHeight(24*2);
+        playIcon.setFitWidth(24*2);
 
         // Add track details
         Text titleText = new Text(track.getTitle());
         Text artistText = new Text(track.getArtist());
-        Text durationText = new Text((track.getDuration()/1000)/60 + ":" + (track.getDuration()/1000)%60);
 
         titleText.getStyleClass().add("track-title");
         artistText.getStyleClass().add("track-artist");
-        durationText.getStyleClass().add("track-duration");
+       
 
-        content.getChildren().addAll(titleText, artistText, durationText);
+        content.getChildren().addAll(playIcon,titleText, artistText);
         button.setGraphic(content);
 
         return button;

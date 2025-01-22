@@ -11,9 +11,11 @@ public class Track implements Comparable<Track> {
     String id;
     int popularity;
     String previewUrl;
-
-    public Track(ImageObject image, String title, String artist, String album, String albumType, String releaseDate, int duration, String uri, String id, int popularity, String previewUrl) {
-        this.image = image;
+    String imageUrl;
+    
+        public Track(ImageObject image, String title, String artist, String album, String albumType, String releaseDate, int duration, String uri, String id, int popularity, String previewUrl) {
+            this.image = image;
+            this.imageUrl = image.getUrl();
         this.title = title;
         this.artist = artist;
         this.album = album;
@@ -34,6 +36,10 @@ public class Track implements Comparable<Track> {
 
     public ImageObject getImage() {
         return image;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
     }
 
     public String getTitle() {
