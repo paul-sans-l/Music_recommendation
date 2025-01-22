@@ -1,3 +1,5 @@
+
+import java.lang.reflect.Type;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -5,17 +7,27 @@ import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
+import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
+import Objects.Track;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Text;
 
 
 
@@ -92,6 +104,11 @@ public class App extends Application {
         submitButton.setOnAction(event -> {
             
             String inputText = textField.getText();
+
+            VBox trackButtonsContainer = new VBox();
+            trackButtonsContainer.setSpacing(10);
+            trackButtonsContainer.setPadding(new Insets(10));
+
             
             System.out.println("Submitted text: " + inputText);
             String authorizationCode = Listener.extractCodeFromUrl(inputText);
@@ -102,8 +119,18 @@ public class App extends Application {
             javafx.animation.PauseTransition pause = new javafx.animation.PauseTransition(javafx.util.Duration.seconds(5));
             pause.setOnFinished(e -> {
                 try {
+                    
                     accessToken = SpotifyApi.getAccessToken(clientId, clientSecret, authorizationCode, redirectUri);
-                    SpotifyApi.getTracks(accessToken, "0O6GWnEyFQLnREx4K9aJn4"); // Load then display the tracks using thread
+                    SpotifyApi.getTracks(accessToken, "6RWiSU4cAHKJUPBaMCXSIV");
+                    List<Track> tracks = loadTracksFromJson("src/Tracks.json");
+                    for (Track track : tracks) {
+                        Button trackButton = createTrackButton(track);
+                        trackButtonsContainer.getChildren().add(trackButton);
+                    }
+                    
+                    root.setCenter(trackButtonsContainer);
+
+
                 } catch (Exception e1) {
                 System.out.println("Error: " + e1);
                 root.setCenter(inputLayout);
@@ -119,7 +146,7 @@ public class App extends Application {
                 errorPause.play();
                 return;
                 }
-                root.setCenter(null); // Remove the loading image after 5 seconds
+                //root.setCenter(null); // Remove the loading image after 5 seconds
             });
             pause.play();
             
@@ -134,10 +161,66 @@ public class App extends Application {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
+
+//-----------------------------------------------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------------------------------------------------------
+
+
         
     }
+
+    private Button createTrackButton(Track track) {
+        // Create the button
+        Button button = new Button();
+        button.setPrefWidth(380);
+        button.setPrefHeight(60);
+        button.getStyleClass().add("track-button");
+
+        // Create the HBox layout
+        HBox content = new HBox();
+        content.setSpacing(10);
+        content.getStyleClass().add("track-content");
+
+        // Add an image for the play icon
+        // ImageView playIcon = new ImageView(new Image(track.getImage().getUrl())); // Replace with your image path
+        // playIcon.setFitHeight(24);
+        // playIcon.setFitWidth(24);
+
+        // Add track details
+        Text titleText = new Text(track.getTitle());
+        Text artistText = new Text(track.getArtist());
+        Text durationText = new Text((track.getDuration()/1000)/60 + ":" + (track.getDuration()/1000)%60);
+
+        titleText.getStyleClass().add("track-title");
+        artistText.getStyleClass().add("track-artist");
+        durationText.getStyleClass().add("track-duration");
+
+        content.getChildren().addAll(titleText, artistText, durationText);
+        button.setGraphic(content);
+
+        return button;
+    }
+
+   public List<Track> loadTracksFromJson(String filename) throws IOException {
+        // Create a Gson instance
+        Gson gson = new Gson();
+
+        // Define the type for the list of tracks
+        Type trackListType = new TypeToken<ArrayList<Track>>() {}.getType();
+
+        // Read the JSON file and parse it into a list of Track objects
+        try (FileReader reader = new FileReader(filename)) {
+            return gson.fromJson(reader, trackListType);
+        }
+    }
+
+    
 
     public static void main(String[] args) {
         launch(args);
     }
+
+    
 }

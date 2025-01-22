@@ -49,3 +49,35 @@
     -fx-background-color: #831474; /* Even darker green when pressed */
     -fx-transform: scale(0.95); /* Slight shrink effect on click */
 }
+
+.track-button {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-padding: 10;
+    -fx-cursor: hand;
+}
+
+.track-button:hover {
+    -fx-background-color: #b729b0; /* Spotify green */
+}
+
+.track-content {
+    -fx-alignment: center-left;
+}
+
+.track-title {
+    -fx-fill: #ffffff;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+}
+
+.track-artist {
+    -fx-fill: #b3b3b3;
+    -fx-font-size: 12px;
+}
+
+.track-duration {
+    -fx-fill: #b3b3b3;
+    -fx-font-size: 12px;
+    -fx-translate-x: 200; /* Adjust for alignment */
+}

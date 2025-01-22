@@ -139,11 +139,10 @@ public class SpotifyApi {
     private static void appendTracksToFile(List<Track> tracks) throws IOException {
         Set<String> existingTrackIds = new HashSet<>();
         JsonArray existingTracksArray = new JsonArray();
-
+    
         // Read existing tracks from file
         try (FileReader reader = new FileReader("Tracks.json")) {
-            JsonObject existingData = JsonParser.parseReader(reader).getAsJsonObject();
-            existingTracksArray = existingData.getAsJsonArray("tracks");
+            existingTracksArray = JsonParser.parseReader(reader).getAsJsonArray();
             for (int i = 0; i < existingTracksArray.size(); i++) {
                 JsonObject track = existingTracksArray.get(i).getAsJsonObject();
                 existingTrackIds.add(track.get("id").getAsString());
@@ -151,7 +150,7 @@ public class SpotifyApi {
         } catch (IOException e) {
             System.err.println("Tracks.json file not found. A new file will be created.");
         }
-
+    
         // Append new tracks if they are not already in the file
         for (Track track : tracks) {
             if (!existingTrackIds.contains(track.getId())) {
@@ -159,7 +158,7 @@ public class SpotifyApi {
                 trackJson.addProperty("imageUrl", track.getImage().getUrl());
                 trackJson.addProperty("title", track.getTitle());
                 trackJson.addProperty("artist", track.getArtist());
-                trackJson.addProperty("albumName", track.getAlbum());
+                trackJson.addProperty("album", track.getAlbum());
                 trackJson.addProperty("albumType", track.getAlbumType());
                 trackJson.addProperty("releaseDate", track.getReleaseDate());
                 trackJson.addProperty("duration", track.getDuration());
@@ -170,12 +169,11 @@ public class SpotifyApi {
                 existingTracksArray.add(trackJson);
             }
         }
-
-        // Write updated tracks to file
+    
+        // Write the updated array of tracks to the file
         try (FileWriter writer = new FileWriter("src/Tracks.json")) {
-            JsonObject updatedData = new JsonObject();
-            updatedData.add("tracks", existingTracksArray);
-            writer.write(updatedData.toString());
+            writer.write(existingTracksArray.toString());
         }
     }
+    
 }

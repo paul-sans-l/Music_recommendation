@@ -2,7 +2,7 @@ package Objects;
 public class Track implements Comparable<Track> {
     ImageObject image;
     String title;
-    String artist;
+   String artist;
     String album;
     String albumType;
     String releaseDate;
