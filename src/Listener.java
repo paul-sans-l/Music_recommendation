@@ -2,6 +2,9 @@ import java.awt.Desktop;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.UUID;
 
 
 public class Listener {
@@ -14,7 +17,7 @@ public class Listener {
     "&response_type=code" +
     "&redirect_uri=" + redirectUri +
     "&scope=playlist-read-private%20playlist-read-collaborative%20user-top-read" +
-    "&state=YourState";
+    "&state=" + UUID.randomUUID().toString();;
         try {
             // Open the Spotify authorization URL in the user's default browser
             URI uri = new URI(authorizationUrl);

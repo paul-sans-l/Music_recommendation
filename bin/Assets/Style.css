@@ -81,3 +81,29 @@
     -fx-font-size: 12px;
     -fx-translate-x: 200; /* Adjust for alignment */
 }
+
+.main {
+    -fx-alignment: center;
+  }
+  
+  .btn {
+    -fx-pref-width: 350px;
+    -fx-pref-height: 60px;
+    -fx-font-size: 18px;
+    -fx-background-color: #b729b0;
+    -fx-background-radius: 50px;
+    -fx-border-width: 0px;
+    -fx-text-fill: #ffffff;
+    -fx-cursor: hand;
+    -fx-effect: none;
+    -fx-transition: all 0.4s;
+  }
+  
+  .btn:hover {
+    -fx-effect:  innershadow(gaussian, #ef476f, 4, 1.0, 0, 0),
+                 innershadow(gaussian, #ffd166, 8, 1.0, 0, 0),
+                 innershadow(gaussian, #06d6a0, 12, 1.0, 0, 0),
+                 innershadow(gaussian, #118ab2, 16, 1.0, 0, 0);
+    -fx-background-color: #1db954;
+    -fx-text-fill: #ffffff;
+  }

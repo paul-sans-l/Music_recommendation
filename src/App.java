@@ -118,52 +118,78 @@ public class App extends Application {
             String authorizationCode = Listener.extractCodeFromUrl(inputText);
             textField.setVisible(false);
             submitButton.setVisible(false);
-            
-            root.setCenter(loadingImage);
-            javafx.animation.PauseTransition pause = new javafx.animation.PauseTransition(javafx.util.Duration.seconds(5));
-            pause.setOnFinished(e -> {
-                try {
-                    
-                    accessToken = SpotifyApi.getAccessToken(clientId, clientSecret, authorizationCode, redirectUri);
-                    SpotifyApi.getTracks(accessToken, "6RWiSU4cAHKJUPBaMCXSIV");
-                    List<Track> tracks = loadTracksFromJson("src/Tracks.json");
-                    for (Track track : tracks) {
-                        Button trackButton = createTrackButton(track);
-                        trackButtonsContainer.getChildren().add(trackButton);
 
-                        trackButton.setOnAction(ev -> {
-                            try {
-                                URI uri = new URI(track.getUri());
-                                Desktop.getDesktop().browse(uri);
-                            } catch (URISyntaxException | IOException e1) {
-                                // TODO Auto-generated catch block
-                                e1.printStackTrace();
-                            }
-                        });
+            Button recomandationButton = new Button(" Custom recommendations");
+            Button topTracksButton = new Button("Targeted recommendations");
+            VBox buttons = new VBox(recomandationButton, topTracksButton);
+            buttons.setAlignment(Pos.CENTER);
+            buttons.setPadding(new Insets(10));
+            buttons.setSpacing(20);
+
+            recomandationButton.getStyleClass().add("btn");
+            topTracksButton.getStyleClass().add("btn");
+
+            root.setCenter(buttons);
+     //--------------------------------Targeted recommendations based on your account top tracks as seeds---------------------------------------------------------------------------------------------
+            topTracksButton.setOnAction(event2 ->{ 
+
+                root.setCenter(loadingImage);
+                javafx.animation.PauseTransition pause = new javafx.animation.PauseTransition(javafx.util.Duration.seconds(5));
+                pause.setOnFinished(e -> {
+                    try {
+                        
+                        accessToken = SpotifyApi.getAccessToken(clientId, clientSecret, authorizationCode, redirectUri);
+                        Recommending.getRecomTracks(accessToken);
+                        //SpotifyApi.getTracks(accessToken, "6RWiSU4cAHKJUPBaMCXSIV");
+                        List<Track> tracks = loadTracksFromJson("src/Tracks.json");
+                        for (Track track : tracks) {
+                            Button trackButton = createTrackButton(track);
+                            trackButtonsContainer.getChildren().add(trackButton);
+    
+                            trackButton.setOnAction(ev -> {
+                                try {
+                                    URI uri = new URI(track.getUri());
+                                    Desktop.getDesktop().browse(uri);
+                                } catch (URISyntaxException | IOException e1) {
+                                    e1.printStackTrace();
+                                }
+                            });
+                        }
+                        
+                        root.setCenter(trackButtonsContainer);
+    
+    
+                    } catch (Exception e1) {
+                    System.out.println("Error: " + e1);
+                    root.setCenter(inputLayout);
+                    textField.setVisible(true);
+                    submitButton.setVisible(true);
+                    Label errorMessage = new Label("The URL is invalid. Please try again. If you lost the URL, please restart the application.");
+                    errorMessage.setTextFill(Color.RED);
+                    root.setBottom(errorMessage);
+                    BorderPane.setAlignment(errorMessage, Pos.CENTER);
+    
+                    javafx.animation.PauseTransition errorPause = new javafx.animation.PauseTransition(javafx.util.Duration.seconds(5));
+                    errorPause.setOnFinished(ev -> root.setBottom(null));
+                    errorPause.play();
+                    return;
                     }
-                    
-                    root.setCenter(trackButtonsContainer);
+                });
+                pause.play();});
+           
+           
+        //----------------------------------------------------------------------------------------------------------------------------- 
 
-
-                } catch (Exception e1) {
-                System.out.println("Error: " + e1);
-                root.setCenter(inputLayout);
-                textField.setVisible(true);
-                submitButton.setVisible(true);
-                Label errorMessage = new Label("The URL is invalid. Please try again. If you lost the URL, please restart the application.");
-                errorMessage.setTextFill(Color.RED);
-                root.setBottom(errorMessage);
-                BorderPane.setAlignment(errorMessage, Pos.CENTER);
-
-                javafx.animation.PauseTransition errorPause = new javafx.animation.PauseTransition(javafx.util.Duration.seconds(5));
-                errorPause.setOnFinished(ev -> root.setBottom(null));
-                errorPause.play();
-                return;
+        //--------------------------------Custom recommendations based on your account top tracks as seeds---------------------------------------------------------------------------------------------
+            recomandationButton.setOnAction(event2 ->{ 
+                try {
+                    URI uri = new URI("https://www.youtube.com/watch?v=dQw4w9WgXcQ&ab_channel=RickAstley");
+                    Desktop.getDesktop().browse(uri);
+                } catch (URISyntaxException | IOException e1) {
+                    e1.printStackTrace();
                 }
-                //root.setCenter(null); // Remove the loading image after 5 seconds
-            });
-            pause.play();
-            
+                });
+        //----------------------------------------------------------------------------------------------------------------------------- 
           
         });
 
@@ -181,9 +207,9 @@ public class App extends Application {
 //-----------------------------------------------------------------------------------------------------------------------------
 //-----------------------------------------------------------------------------------------------------------------------------
 
-
         
     }
+
 
     private Button createTrackButton(Track track) {
         // Create the button
@@ -228,6 +254,8 @@ public class App extends Application {
             return gson.fromJson(reader, trackListType);
         }
     }
+
+    
 
     
 

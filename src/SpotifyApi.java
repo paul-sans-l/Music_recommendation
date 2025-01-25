@@ -107,7 +107,7 @@ public class SpotifyApi {
                 System.err.println("No tracks found in the response.");
                 return new ArrayList<>();
             }
-    
+            System.out.println(jsonResponse);
             JsonArray tracks = jsonResponse.getAsJsonArray("items");
             List<Track> trackList = new ArrayList<>();
             for (int i = 0; i < tracks.size(); i++) {
@@ -131,16 +131,16 @@ public class SpotifyApi {
                 trackList.add(newTrack);
                 System.out.println("Track: " + title + " by " + artist);
             }
-            appendTracksToFile(trackList);
+            updateTrackFiles(trackList);
             return trackList;
         }
     }
 
-    private static void appendTracksToFile(List<Track> tracks) throws IOException {
+    private static void updateTrackFiles(List<Track> tracks) throws IOException {
         Set<String> existingTrackIds = new HashSet<>();
         JsonArray existingTracksArray = new JsonArray();
     
-        // Read existing tracks from file
+        // Read existing tracks from Tracks.json
         try (FileReader reader = new FileReader("Tracks.json")) {
             existingTracksArray = JsonParser.parseReader(reader).getAsJsonArray();
             for (int i = 0; i < existingTracksArray.size(); i++) {
@@ -151,7 +151,7 @@ public class SpotifyApi {
             System.err.println("Tracks.json file not found. A new file will be created.");
         }
     
-        // Append new tracks if they are not already in the file
+        // Append new tracks if they are not already in Tracks.json
         for (Track track : tracks) {
             if (!existingTrackIds.contains(track.getId())) {
                 JsonObject trackJson = new JsonObject();
@@ -170,7 +170,7 @@ public class SpotifyApi {
             }
         }
     
-        // Write the updated array of tracks to the file
+        // Write the updated tracks to Tracks.json
         try (FileWriter writer = new FileWriter("src/Tracks.json")) {
             writer.write(existingTracksArray.toString());
         }
