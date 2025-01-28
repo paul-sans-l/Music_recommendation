@@ -107,3 +107,34 @@
     -fx-background-color: #1db954;
     -fx-text-fill: #ffffff;
   }
+
+  /* Styling the scrollbars of ScrollPane */
+.scroll-pane {
+    -fx-background-color: black; /* Set the background color of the scrollpane */
+}
+
+/* Vertical scrollbar customization */
+.scroll-pane .viewport {
+    -fx-background-color: transparent; /* Make the viewport background transparent */
+}
+
+.scroll-pane .scroll-bar {
+    -fx-background-color: #444444; /* Scrollbar background color */
+    -fx-background-radius: 10px; /* Round the edges of the scrollbar */
+    -fx-pref-width: 12px; /* Set the width of the scrollbar */
+}
+
+.scroll-pane .scroll-bar .thumb {
+    -fx-background-color: #888888; /* Color of the scrollbar thumb */
+    -fx-background-radius: 10px; /* Round the edges of the thumb */
+}
+
+/* Styling the horizontal scrollbar */
+.scroll-pane .scroll-bar:horizontal {
+    -fx-pref-height: 12px; /* Set the height of the horizontal scrollbar */
+}
+
+/* Styling the vertical scrollbar */
+.scroll-pane .scroll-bar:vertical {
+    -fx-pref-width: 12px; /* Set the width of the vertical scrollbar */
+}

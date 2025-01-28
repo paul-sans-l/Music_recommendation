@@ -107,7 +107,7 @@ public class SpotifyApi {
                 System.err.println("No tracks found in the response.");
                 return new ArrayList<>();
             }
-            System.out.println(jsonResponse);
+            
             JsonArray tracks = jsonResponse.getAsJsonArray("items");
             List<Track> trackList = new ArrayList<>();
             for (int i = 0; i < tracks.size(); i++) {
@@ -131,7 +131,7 @@ public class SpotifyApi {
                 trackList.add(newTrack);
                 System.out.println("Track: " + title + " by " + artist);
             }
-            updateTrackFiles(trackList);
+            //updateTrackFiles(trackList);
             return trackList;
         }
     }

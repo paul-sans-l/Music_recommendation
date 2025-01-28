@@ -12,6 +12,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
@@ -45,11 +46,19 @@ public class App extends Application {
     public void start(Stage primaryStage) {
         
         BorderPane root = new BorderPane();
-        Scene scene = new Scene(root, 1000, 500);
+        root.setStyle("-fx-background-color: black;");
+        
+
+        ScrollPane scrollableRoot = new ScrollPane(root);
+        Scene scene = new Scene(scrollableRoot, 1000, 500);
+
+        scrollableRoot.setFitToWidth(true); // Adjusts to fit the width of the scene
+        scrollableRoot.setFitToHeight(true); // Adjusts to fit the height of the scene
+        scrollableRoot.setVbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS); // Always show the vertical scrollbar
+        scrollableRoot.setHbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED); // Horizontal scrollbar only when needed
 
         Image icon = new Image(getClass().getResource("Assets/Logo_processed.jpg").toExternalForm());
         primaryStage.getIcons().add(icon);
-
         
 
         Image image = new Image(getClass().getResource("Assets/Spotify_Full_logo.png").toExternalForm());
@@ -108,19 +117,17 @@ public class App extends Application {
         submitButton.setOnAction(event -> {
             
             String inputText = textField.getText();
-
             VBox trackButtonsContainer = new VBox();
             trackButtonsContainer.setSpacing(10);
             trackButtonsContainer.setPadding(new Insets(10));
-
-            
+        
             System.out.println("Submitted text: " + inputText);
             String authorizationCode = Listener.extractCodeFromUrl(inputText);
             textField.setVisible(false);
             submitButton.setVisible(false);
 
-            Button recomandationButton = new Button(" Custom recommendations");
-            Button topTracksButton = new Button("Targeted recommendations");
+            Button recomandationButton = new Button(" Targeted recommendations");
+            Button topTracksButton = new Button("Custom recommendations");
             VBox buttons = new VBox(recomandationButton, topTracksButton);
             buttons.setAlignment(Pos.CENTER);
             buttons.setPadding(new Insets(10));
@@ -139,7 +146,7 @@ public class App extends Application {
                     try {
                         
                         accessToken = SpotifyApi.getAccessToken(clientId, clientSecret, authorizationCode, redirectUri);
-                        Recommending.getRecomTracks(accessToken);
+                        Recommending.GetRecomTracks(accessToken);
                         //SpotifyApi.getTracks(accessToken, "6RWiSU4cAHKJUPBaMCXSIV");
                         List<Track> tracks = loadTracksFromJson("src/Tracks.json");
                         for (Track track : tracks) {
@@ -155,6 +162,7 @@ public class App extends Application {
                                 }
                             });
                         }
+
                         
                         root.setCenter(trackButtonsContainer);
     
@@ -182,12 +190,50 @@ public class App extends Application {
 
         //--------------------------------Custom recommendations based on your account top tracks as seeds---------------------------------------------------------------------------------------------
             recomandationButton.setOnAction(event2 ->{ 
-                try {
-                    URI uri = new URI("https://www.youtube.com/watch?v=dQw4w9WgXcQ&ab_channel=RickAstley");
-                    Desktop.getDesktop().browse(uri);
-                } catch (URISyntaxException | IOException e1) {
-                    e1.printStackTrace();
-                }
+                root.setCenter(loadingImage);
+                javafx.animation.PauseTransition pause = new javafx.animation.PauseTransition(javafx.util.Duration.seconds(5));
+                pause.setOnFinished(e -> {
+                    try {
+                        
+                        accessToken = SpotifyApi.getAccessToken(clientId, clientSecret, authorizationCode, redirectUri);
+                        Recommending.GetRecomTracks2(accessToken);
+                        //SpotifyApi.getTracks(accessToken, "6RWiSU4cAHKJUPBaMCXSIV");
+                        List<Track> tracks = loadTracksFromJson("src/Tracks.json");
+                        for (Track track : tracks) {
+                            Button trackButton = createTrackButton(track);
+                            trackButtonsContainer.getChildren().add(trackButton);
+    
+                            trackButton.setOnAction(ev -> {
+                                try {
+                                    URI uri = new URI(track.getUri());
+                                    Desktop.getDesktop().browse(uri);
+                                } catch (URISyntaxException | IOException e1) {
+                                    e1.printStackTrace();
+                                }
+                            });
+                        }
+
+                        
+                        root.setCenter(trackButtonsContainer);
+    
+    
+                    } catch (Exception e1) {
+                    System.out.println("Error: " + e1);
+                    root.setCenter(inputLayout);
+                    textField.setVisible(true);
+                    submitButton.setVisible(true);
+                    Label errorMessage = new Label("The URL is invalid. Please try again. If you lost the URL, please restart the application.");
+                    errorMessage.setTextFill(Color.RED);
+                    root.setBottom(errorMessage);
+                    BorderPane.setAlignment(errorMessage, Pos.CENTER);
+    
+                    javafx.animation.PauseTransition errorPause = new javafx.animation.PauseTransition(javafx.util.Duration.seconds(5));
+                    errorPause.setOnFinished(ev -> root.setBottom(null));
+                    errorPause.play();
+                    return;
+                    }
+                });
+                pause.play();
                 });
         //----------------------------------------------------------------------------------------------------------------------------- 
           
