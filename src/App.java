@@ -15,6 +15,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 
 import java.io.File;
 import java.io.FileReader;
@@ -44,7 +45,10 @@ public class App extends Application {
 
     @Override
     public void start(Stage primaryStage) {
+
+
         
+       
         BorderPane root = new BorderPane();
         root.setStyle("-fx-background-color: black;");
         

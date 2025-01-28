@@ -16,7 +16,7 @@ public class Listener {
     "?client_id=" + clientId +
     "&response_type=code" +
     "&redirect_uri=" + redirectUri +
-    "&scope=playlist-read-private%20playlist-read-collaborative%20user-top-read" +
+    "&scope=playlist-read-private%20playlist-read-collaborative%20user-top-read%20user-library-read" +
     "&state=" + UUID.randomUUID().toString();;
         try {
             // Open the Spotify authorization URL in the user's default browser

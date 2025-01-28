@@ -123,13 +123,13 @@ public class Recommending {
                 System.out.println("Track: " + title + " by " + artist);
             }
             System.out.println("Tracks: " + trackList);
-            updateTrackFiles(trackList);
+            updateTrackFiles(trackList, accessToken);
             return trackList;
         }
     }
     
 
-    private static void updateTrackFiles(List<Track> tracks) throws IOException {
+    private static void updateTrackFiles(List<Track> tracks, String accessToken) throws IOException {
         Set<String> existingTrackIds = new HashSet<>();
         JsonArray existingTracksArray = new JsonArray();
     
@@ -146,7 +146,7 @@ public class Recommending {
     
         // Append new tracks if they are not already in Tracks.json
         for (Track track : tracks) {
-            if (!existingTrackIds.contains(track.getId())) {
+            if (!existingTrackIds.contains(track.getId()) && !isSaved(accessToken, track)) {
                 JsonObject trackJson = new JsonObject();
                 trackJson.addProperty("imageUrl", track.getImage().getUrl());
                 trackJson.addProperty("title", track.getTitle());
@@ -331,6 +331,7 @@ public class Recommending {
         public static List<Track> GetRecomTracks(String accessToken) throws IOException {
             List<miniTrack> miniTrackList = getrecom1(accessToken);
             List<Track> trackList = new ArrayList<>();
+            Set<String> existingTrackIds = new HashSet<>();
         
             for (miniTrack miniTrack : miniTrackList) {
                 String artist = URLEncoder.encode(miniTrack.getArtist(), StandardCharsets.UTF_8.toString());
@@ -374,13 +375,15 @@ public class Recommending {
                         String previewUrl = track.has("preview_url") && !track.get("preview_url").isJsonNull() ? track.get("preview_url").getAsString() : "";
         
                         Track newTrack = new Track(image, miniTrack.getName(), miniTrack.getArtist(), albumName, albumType, releaseDate, duration, uri, id, popularity, previewUrl);
-                        trackList.add(newTrack);
-                        System.out.println("Track: " + title + " by " + artist);
+                        if(!existingTrackIds.contains(newTrack.getId())) {
+                            existingTrackIds.add(newTrack.getId());
+                            trackList.add(newTrack);
+                            System.out.println("Track: " + title + " by " + artist);}
                     }
                     
                 }
             }
-            updateTrackFiles(trackList);
+            updateTrackFiles(trackList, accessToken);
             return trackList;
         }
 
@@ -494,7 +497,7 @@ public class Recommending {
         public static List<Track> GetRecomTracks2(String accessToken) throws IOException {
             List<miniTrack> miniTrackList = getrecom2(accessToken);
             List<Track> trackList = new ArrayList<>();
-        
+            Set<String> existingTrackIds = new HashSet<>();
             for (miniTrack miniTrack : miniTrackList) {
                 String artist = URLEncoder.encode(miniTrack.getArtist(), StandardCharsets.UTF_8.toString());
                 String title = URLEncoder.encode(miniTrack.getName(), StandardCharsets.UTF_8.toString());
@@ -535,18 +538,45 @@ public class Recommending {
                         String id = track.get("id").getAsString();
                         int popularity = track.get("popularity").getAsInt();
                         String previewUrl = track.has("preview_url") && !track.get("preview_url").isJsonNull() ? track.get("preview_url").getAsString() : "";
-        
                         Track newTrack = new Track(image, miniTrack.getName(), miniTrack.getArtist(), albumName, albumType, releaseDate, duration, uri, id, popularity, previewUrl);
+                        if(!existingTrackIds.contains(newTrack.getId())) {
+                        existingTrackIds.add(newTrack.getId());
                         trackList.add(newTrack);
-                        System.out.println("Track: " + title + " by " + artist);
+                        System.out.println("Track: " + title + " by " + artist);}
                     }
                     
                 }
             }
-            updateTrackFiles(trackList);
+            updateTrackFiles(trackList,accessToken);
             return trackList;
         }
 
+        private static boolean isSaved(String accessToken, Track track) throws IOException {
+            HttpGet get = new HttpGet("https://api.spotify.com/v1/me/tracks/contains?ids=" + track.getId());
+            get.setHeader("Authorization", "Bearer " + accessToken);
+    
+            try (CloseableHttpClient client = HttpClients.createDefault();
+                 CloseableHttpResponse response = client.execute(get)) {
+    
+                int statusCode = response.getStatusLine().getStatusCode();
+                if (statusCode != 200) {
+                    System.err.println("Failed to fetch tracks. HTTP Status Code: " + statusCode);
+                    String responseBody = EntityUtils.toString(response.getEntity());
+                    System.err.println("Response Body: " + responseBody);
+                    return false;
+                } else {
+                    String responseBody = EntityUtils.toString(response.getEntity());
+                    System.out.println("Response Body: " + responseBody);
+    
+                    // Parse the JSON response
+                    Gson gson = new Gson();
+                    boolean[] result = gson.fromJson(responseBody, boolean[].class);
+    
+                    // Return the first element, as the API returns an array of booleans
+                    return result.length > 0 && result[0];
+                }
+            }
+        }
     }
 
 
