@@ -79,7 +79,6 @@
 .track-duration {
     -fx-fill: #b3b3b3;
     -fx-font-size: 12px;
-    -fx-translate-x: 200; /* Adjust for alignment */
 }
 
 .main {

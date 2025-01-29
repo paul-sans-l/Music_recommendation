@@ -2,14 +2,13 @@ import java.awt.Desktop;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
+
 import java.util.UUID;
 
 
 public class Listener {
     public static void browse() throws IOException {
-        String clientId = "20495fa10b8d4f74bfce20d4d8fde4e5"; // Replace with your Spotify client ID
+        String clientId = "CLIENT_ID"; // Replace with your Spotify client ID
         String redirectUri = "http://localhost:8888/callback";
 
         String authorizationUrl = "https://accounts.spotify.com/authorize" +

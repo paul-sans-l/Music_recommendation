@@ -28,7 +28,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
-import Objects.ArtistObject;
 import Objects.ImageObject;
 import Objects.Track;
  class miniTrack {
@@ -47,86 +46,8 @@ public miniTrack(String artist, String name) {
     
 }
 public class Recommending {
-    private static final String API_KEY = "c33ee5e5acd41399c980aad367f4b49e";
-    private static final String SHARED_SECRET = "5b6e7513029d558e3b47d5517c79c52a";
+    private static final String API_KEY = "MY_API_KEY";
 
-    public static List<Track> getRecomTracks(String accessToken) throws IOException {
-
-        HttpGet get = new HttpGet("https://api.spotify.com/v1/tracks?ids=2CGNAOSuO1MEFCbBRgUzjd,6jTQijAuYxOd8DjQ8D6UkL,6plp1nJtm4Y3m87qmDCy61");
-        get.setHeader("Authorization", "Bearer " + accessToken);
-    
-        try (CloseableHttpClient client = HttpClients.createDefault();
-             CloseableHttpResponse response = client.execute(get)) {
-    
-            int statusCode = response.getStatusLine().getStatusCode();
-            if (statusCode != 200) {
-                System.err.println("Failed to fetch tracks. HTTP Status Code: " + statusCode);
-                String responseBody = EntityUtils.toString(response.getEntity());
-                System.err.println("Response Body: " + responseBody);
-                return new ArrayList<>();
-            }
-    
-            String responseBody = EntityUtils.toString(response.getEntity());
-            JsonObject jsonResponse = JsonParser.parseString(responseBody).getAsJsonObject();
-    
-            // Check if the "tracks" field is present
-            if (!jsonResponse.has("tracks")) {
-                System.err.println("No tracks found in the response.");
-                return new ArrayList<>();
-            }
-            JsonArray tracks = jsonResponse.getAsJsonArray("tracks");
-            List<Track> trackList = new ArrayList<>();
-            for (int i = 0; i < tracks.size(); i++) {
-                JsonObject track = tracks.get(i).getAsJsonObject();
-                JsonObject album = track.getAsJsonObject("album");
-    
-                // Access image
-                JsonArray images = album.getAsJsonArray("images");
-                String imageUrl = images.size() > 0 ? images.get(0).getAsJsonObject().get("url").getAsString() : "";
-                ImageObject image = new ImageObject(50, 50, imageUrl);
-    
-                // Access title
-                String title = track.get("name").getAsString();
-    
-                // Access artist
-                JsonArray artists = track.getAsJsonArray("artists");
-                String artist = artists.size() > 0 ? artists.get(0).getAsJsonObject().get("name").getAsString() : "";
-    
-                // Access album name
-                String albumName = album.get("name").getAsString();
-    
-                // Access album type
-                String albumType = album.get("album_type").getAsString();
-    
-                // Access release date
-                String releaseDate = album.get("release_date").getAsString();
-    
-                // Access duration
-                int duration = track.get("duration_ms").getAsInt();
-    
-                // Access URI
-                String uri = track.get("uri").getAsString();
-    
-                // Access ID
-                String id = track.get("id").getAsString();
-    
-                // Access popularity
-                int popularity = track.get("popularity").getAsInt();
-    
-                // Access preview URL
-                String previewUrl = track.has("preview_url") && !track.get("preview_url").isJsonNull() ? track.get("preview_url").getAsString() : "";
-    
-                // Create Track object
-                Track newTrack = new Track(image, title, artist, albumName, albumType, releaseDate, duration, uri, id, popularity, previewUrl);
-    
-                trackList.add(newTrack);
-                System.out.println("Track: " + title + " by " + artist);
-            }
-            System.out.println("Tracks: " + trackList);
-            updateTrackFiles(trackList, accessToken);
-            return trackList;
-        }
-    }
     
 
     private static void updateTrackFiles(List<Track> tracks, String accessToken) throws IOException {
@@ -221,8 +142,8 @@ public class Recommending {
 }
 
 
-        private static List<miniTrack> getrecom1(String accessToken) throws IOException {
-            List<Track> trackList = SpotifyApi.getTracks(accessToken, "5TMZSBlb50jH6KmI2YMAHD");
+        private static List<miniTrack> getSimilarFromSeeds(String accessToken) throws IOException {
+            List<Track> trackList = SpotifyApi.getTracks(accessToken, "MY_SEEDS_PLAYLIST_ID");
         
             ExecutorService executorService = Executors.newFixedThreadPool(5);
             List<miniTrack> miniTrackList = Collections.synchronizedList(new ArrayList<>());
@@ -328,8 +249,8 @@ public class Recommending {
         }
         
 
-        public static List<Track> GetRecomTracks(String accessToken) throws IOException {
-            List<miniTrack> miniTrackList = getrecom1(accessToken);
+        public static List<Track> GetCustom(String accessToken) throws IOException {
+            List<miniTrack> miniTrackList = getSimilarFromSeeds(accessToken);
             List<Track> trackList = new ArrayList<>();
             Set<String> existingTrackIds = new HashSet<>();
         
@@ -388,7 +309,7 @@ public class Recommending {
         }
 
 
-        private static List<miniTrack> getrecom2(String accessToken) throws IOException {
+        private static List<miniTrack> getSimilarFromTopTracks(String accessToken) throws IOException {
             List<Track> trackList = Recommending.getTopTracks(accessToken);
         
             ExecutorService executorService = Executors.newFixedThreadPool(5);
@@ -494,8 +415,8 @@ public class Recommending {
             return miniTrackList;
         }
 
-        public static List<Track> GetRecomTracks2(String accessToken) throws IOException {
-            List<miniTrack> miniTrackList = getrecom2(accessToken);
+        public static List<Track> GetTargeted(String accessToken) throws IOException {
+            List<miniTrack> miniTrackList = getSimilarFromTopTracks(accessToken);
             List<Track> trackList = new ArrayList<>();
             Set<String> existingTrackIds = new HashSet<>();
             for (miniTrack miniTrack : miniTrackList) {
@@ -566,13 +487,14 @@ public class Recommending {
                     return false;
                 } else {
                     String responseBody = EntityUtils.toString(response.getEntity());
-                    System.out.println("Response Body: " + responseBody);
+                    
     
                     // Parse the JSON response
                     Gson gson = new Gson();
                     boolean[] result = gson.fromJson(responseBody, boolean[].class);
     
                     // Return the first element, as the API returns an array of booleans
+                    System.out.println("Track is saved: " + track.getTitle() +" by " + track.getArtist() + " " + result[0]);
                     return result.length > 0 && result[0];
                 }
             }

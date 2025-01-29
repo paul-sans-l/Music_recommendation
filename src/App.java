@@ -12,12 +12,12 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Region;
+
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
-import javafx.stage.StageStyle;
 
-import java.io.File;
+
+
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -39,9 +39,9 @@ import javafx.scene.text.Text;
 
 public class App extends Application {
     private static String accessToken;
-    private String clientId = "20495fa10b8d4f74bfce20d4d8fde4e5"; // Replace with your Spotify client ID
+    private String clientId = "CLIENT_ID_HERE"; // Replace with your Spotify client ID
     private String redirectUri = "http://localhost:8888/callback";
-    private String clientSecret = "60fa5f30ef674a89a353e3cc4eb745a7";
+    private String clientSecret = "MY_ClIeNt_SeCrEt"; // Replace with your Spotify client secret
 
     @Override
     public void start(Stage primaryStage) {
@@ -114,11 +114,16 @@ public class App extends Application {
         // Add input layout to the center of the root pane
         root.setCenter(inputLayout);
         
+
+
         });
         welcomePause.play();
         
         
+
         submitButton.setOnAction(event -> {
+
+            
             
             String inputText = textField.getText();
             VBox trackButtonsContainer = new VBox();
@@ -141,6 +146,7 @@ public class App extends Application {
             topTracksButton.getStyleClass().add("btn");
 
             root.setCenter(buttons);
+
      //--------------------------------Targeted recommendations based on your account top tracks as seeds---------------------------------------------------------------------------------------------
             topTracksButton.setOnAction(event2 ->{ 
 
@@ -150,8 +156,7 @@ public class App extends Application {
                     try {
                         
                         accessToken = SpotifyApi.getAccessToken(clientId, clientSecret, authorizationCode, redirectUri);
-                        Recommending.GetRecomTracks(accessToken);
-                        //SpotifyApi.getTracks(accessToken, "6RWiSU4cAHKJUPBaMCXSIV");
+                        Recommending.GetCustom(accessToken);
                         List<Track> tracks = loadTracksFromJson("src/Tracks.json");
                         for (Track track : tracks) {
                             Button trackButton = createTrackButton(track);
@@ -166,9 +171,10 @@ public class App extends Application {
                                 }
                             });
                         }
-
                         
                         root.setCenter(trackButtonsContainer);
+                       
+                    
     
     
                     } catch (Exception e1) {
@@ -200,8 +206,7 @@ public class App extends Application {
                     try {
                         
                         accessToken = SpotifyApi.getAccessToken(clientId, clientSecret, authorizationCode, redirectUri);
-                        Recommending.GetRecomTracks2(accessToken);
-                        //SpotifyApi.getTracks(accessToken, "6RWiSU4cAHKJUPBaMCXSIV");
+                        Recommending.GetTargeted(accessToken);
                         List<Track> tracks = loadTracksFromJson("src/Tracks.json");
                         for (Track track : tracks) {
                             Button trackButton = createTrackButton(track);
@@ -270,23 +275,27 @@ public class App extends Application {
 
         // Create the HBox layout
         HBox content = new HBox();
-        content.setSpacing(10);
+        content.setSpacing(25);
         content.getStyleClass().add("track-content");
 
         // Add an image for the play icon
         ImageView playIcon = new ImageView(new Image(track.getImageUrl())); // Replace with your image path
-        playIcon.setFitHeight(24*2);
-        playIcon.setFitWidth(24*2);
+        playIcon.setFitHeight(24*2.5);
+        playIcon.setFitWidth(24*2.5);
 
         // Add track details
         Text titleText = new Text(track.getTitle());
         Text artistText = new Text(track.getArtist());
+        
+        String duration = track.getDuration()/1000%60 < 10 ? track.getDuration()/(60000) + ":0" + track.getDuration()/1000%60 : track.getDuration()/(60000) + ":" + track.getDuration()/1000%60;
+        Text durationText = new Text(duration);
 
         titleText.getStyleClass().add("track-title");
         artistText.getStyleClass().add("track-artist");
+        durationText.getStyleClass().add("track-duration");
        
 
-        content.getChildren().addAll(playIcon,titleText, artistText);
+        content.getChildren().addAll(playIcon,titleText, artistText, durationText);
         button.setGraphic(content);
 
         return button;
